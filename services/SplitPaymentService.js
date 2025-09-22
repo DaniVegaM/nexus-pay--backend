@@ -1,4 +1,5 @@
 import { createOpenPaymentsService, DEFAULT_TEST_CONFIG } from "./ClientOpenPaymentsService.js";
+import {isFinalizedGrant} from "@interledger/open-payments";
 
 /**
  * Servicio especializado para manejar pagos divididos (split payments)
@@ -628,7 +629,8 @@ class SplitPaymentService {
                 splitPayment.finalizedGrant,
                 {
                     walletAddress: splitPayment.senderWallet.id,
-                    quoteId: quote.id
+                    quoteId: quote.id,
+
                 }
             );
 
@@ -711,7 +713,11 @@ class SplitPaymentService {
         // 2) Payload para el RS del receptor (el incoming se crea en la wallet del receptor)
         const payload = {
             walletAddress: recipientWallet.id,
-            ...(description ? { description } : {})
+            incomingAmount: {
+                assetCode: recipientWallet.assetCode,
+                assetScale: recipientWallet.assetScale,
+                value: amount
+            }
         };
 
         const incomingPayment = await this.openPaymentsService.createIncomingPayment(
@@ -726,21 +732,27 @@ class SplitPaymentService {
 
     async _createQuote(senderWallet, recipientWallet, incomingPaymentId,debitAmountValue) {
         const quoteGrant = await this.openPaymentsService.createQuoteGrant(senderWallet);
+        console.log(quoteGrant)
 
-        return await this.openPaymentsService.createQuote(
-            recipientWallet.resourceServer,
-            quoteGrant,
-            {
-                walletAddress: senderWallet.id,
-                receiver: incomingPaymentId,
-                method: "ilp",
-                debitAmount: {
-                    assetCode: senderWallet.assetCode,
-                    assetScale: senderWallet.assetScale,
-                    value: debitAmountValue.toString()
+
+        try {
+            return await this.openPaymentsService.createQuote(
+                recipientWallet.resourceServer,
+                quoteGrant,
+                {
+                    walletAddress: senderWallet.id,
+                    receiver: incomingPaymentId,
+                    method: "ilp",
+                    debitAmount: {
+                        assetCode: senderWallet.assetCode,
+                        assetScale: senderWallet.assetScale,
+                        value: debitAmountValue.toString()
+                    }
                 }
-            }
-        );
+            );
+        }catch (e){
+            console.log(e)
+        }
     }
 
     _validateSplitRequest(request) {

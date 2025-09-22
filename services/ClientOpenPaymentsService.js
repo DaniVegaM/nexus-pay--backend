@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { createAuthenticatedClient, isFinalizedGrant, isPendingGrant } from "@interledger/open-payments";
+import {createAuthenticatedClient, isFinalizedGrant, isPendingGrant} from "@interledger/open-payments";
 import * as readline from "node:readline";
 import crypto from "crypto";
 import path from "node:path";
@@ -30,6 +30,8 @@ class ClientOpenPaymentsService {
      * Inicializa y retorna un cliente autenticado de Open Payments
      */
     async initializeClient() {
+        try{
+
         if (this.client) return this.client;
 
         const privateKey = typeof this.config.privateKey === 'string'
@@ -40,12 +42,17 @@ class ClientOpenPaymentsService {
             walletAddressUrl: this.config.walletAddressUrl,
             privateKey: privateKey,
             keyId: this.config.keyId,
+
         });
 
         return this.client;
+        }catch (e){
+            console.log(e);
+        }
     }
 
     async initializeClientFor(walletAddressUrl) {
+        try{
         // Reutiliza si ya es el mismo wallet activo
         if (this.client && this._currentWallet === walletAddressUrl) {
             return this.client;
@@ -67,6 +74,9 @@ class ClientOpenPaymentsService {
         this._currentWallet = walletAddressUrl;
 
         return dynamicClient;
+        }catch (e){
+            console.log(e);
+        }
     }
     // ============= WALLET ADDRESS OPERATIONS =============
 
@@ -95,7 +105,9 @@ class ClientOpenPaymentsService {
      */
     async requestGrant(authServerUrl, grantRequest) {
         const client = await this.initializeClient();
-        return await client.grant.request({ url: authServerUrl }, grantRequest);
+        console.warn({authServerUrl})
+        console.warn({grantRequest})
+        return await client.grant.request({url: authServerUrl}, grantRequest);
     }
 
     /**
@@ -140,14 +152,22 @@ class ClientOpenPaymentsService {
      * Crea un grant para cotizaciones
      */
     async createQuoteGrant(walletAddress, actions = ["create", "read"]) {
-        return await this.requestGrant(walletAddress.authServer, {
-            access_token: {
-                access: [{
-                    type: "quote",
-                    actions: actions
-                }]
-            }
-        });
+        try {
+            await this.requestGrant(walletAddress.authServer, {
+                access_token: {
+                    access: [
+                        {
+                            type: 'incoming-payment',
+                            actions: ['create', 'read']
+                        }
+                    ]
+                }
+            });
+            process.exit(1)
+        }catch (e) {
+            console.log("Error creando quoteGrant");
+            console.log(e)
+        }
     }
 
     /**
@@ -222,13 +242,15 @@ class ClientOpenPaymentsService {
 
         console.log({
                 url: walletAddress.resourceServer,
-                accessToken: grant.access_token.value
+                accessToken: grant.access_token.value,
+
             },
-            paymentData)
+            paymentData
+            )
         return await client.incomingPayment.create(
             {
                 url: walletAddress.resourceServer,
-                accessToken: grant.access_token.value
+                accessToken: grant.access_token.value,
             },
             paymentData
         );

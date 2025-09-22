@@ -20,7 +20,7 @@ function pretty(obj) {
 // --------- puedes ajustar aquí tus wallets de prueba ----------
 const SENDER_WALLET = process.env.SENDER_WALLET || "https://ilp.interledger-test.dev/yisus19";
 const RECIPIENT_A    = process.env.RECIPIENT_A    || "https://ilp.interledger-test.dev/client_test";
-const RECIPIENT_B    = process.env.RECIPIENT_B    || "https://ilp.interledger-test.dev/danivega";
+const RECIPIENT_B    = process.env.RECIPIENT_B    || "https://ilp.interledger-test.dev/obot";
 // totalAmount se usa para calcular porcentajes y también para el límite del grant
 const TOTAL_AMOUNT   = Number(process.env.SPLIT_TOTAL || 300000);
 
@@ -44,7 +44,7 @@ async function main() {
         senderWalletUrl: SENDER_WALLET,
         recipients: [
             {
-                walletUrl: RECIPIENT_A,
+                walletUrl: RECIPIENT_B,
                 type: "fixed",
                 value: 15000, // MXN 150 al primer receptor
                 description: "Pago fijo A",
@@ -52,7 +52,7 @@ async function main() {
                 percentage: 50
             },
             {
-                walletUrl: RECIPIENT_B,
+                walletUrl: RECIPIENT_A,
                 type: "remaining", // se lleva el remanente del TOTAL_AMOUNT
                 description: "Resto para B",
                 priority: 2
@@ -62,7 +62,7 @@ async function main() {
         totalAmount: TOTAL_AMOUNT,
         description: "Split de prueba via SplitPaymentService",
         execution: {
-            parallel: true,
+            parallel: false,
             stopOnError: false,
             maxConcurrent: 5
         }
