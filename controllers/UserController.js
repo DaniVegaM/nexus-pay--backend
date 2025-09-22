@@ -21,10 +21,11 @@ export const postUser = async (req, res) => {
             data: createdUser
         });
     } catch (error) {
+        console.error("Error creating user:", error);
         res.status(400).json({ 
             success: false,
             message: "Error while creating User.",
-            error: 'Failed to create user' 
+            error: error.message 
         });
     }   
 };
@@ -69,7 +70,7 @@ export const updateUser = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Error while updating User.",
-            error: "Internal Server Error"
+            error: error.message
         });
     }
 };
