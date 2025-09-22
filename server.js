@@ -23,7 +23,9 @@ app.use((req, res, next) => {
 //Sync DB
 try {
     await db.authenticate(); //Async function
-    await db.sync();
+    await db.sync({
+      force: true
+    });
     console.log("Connection to DB established");
 } catch (error) {
     console.log(error);
@@ -32,10 +34,9 @@ try {
 // Ruta base
 app.get('/', (req, res) => {
   res.json({ 
-    message: 'API Proyecto Fénix funcionando correctamente',
+    message: 'Project Nexus Pay API',
     endpoints: [
-      'GET /api/users - Obtener todos los usuarios',
-      'POST /api/users - Crear un usuario'
+      'GET /api/member/ - Get all members',
     ]
   });
 });

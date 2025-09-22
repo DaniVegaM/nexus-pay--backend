@@ -1,8 +1,7 @@
 import { DataTypes } from "sequelize";
 import db from "../config/database.js";
-import bcrypt from 'bcrypt';
 
-const User = db.define('User', {
+const Member = db.define('Member', {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -18,25 +17,22 @@ const User = db.define('User', {
         allowNull: false,
         unique: true
     },
-    password: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
     walletAddress: {
         type: DataTypes.STRING,
         allowNull: false,
+    },
+    salary: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+            min: 0
+        }
+    },
+    rol: {
+        type: DataTypes.STRING(50),
+        allowNull: true
     }
 });
 
-User.beforeCreate(async (user) => {
-    if(user.password){
-        const salt = await bcrypt.genSalt(2);
-        user.password = await bcrypt.hash(user.password, salt);
-    }
-});
-
-User.prototype.validatePassword = function (password){
-    return bcrypt.compareSync(password, this.password);
-}
-
-export default User;
+export default Member;

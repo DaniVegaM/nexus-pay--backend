@@ -1,15 +1,20 @@
-const User = require('./User');
+import User from './UserModel.js';
+import Member from './MemberModel.js';
+import Project from './ProjectModel.js';
+import Team from './TeamModel.js';
 
-// Aquí puedes agregar más modelos y sus relaciones
-// const Team = require('./Team');
-// const PaymentLink = require('./PaymentLink');
+User.hasMany(Project);
+Project.belongsTo(User);
 
-// Definir relaciones entre modelos
-// User.hasMany(Team);
-// Team.belongsTo(User);
+Team.hasMany(Member);
+Member.belongsTo(Team);
 
-module.exports = {
+Project.hasMany(Team);
+Team.belongsTo(Project);
+
+export {
   User,
-  // Team,
-  // PaymentLink
+  Member,
+  Project,
+  Team,
 };
