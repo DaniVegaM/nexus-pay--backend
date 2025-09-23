@@ -156,8 +156,8 @@ router.get('/split-payment/:splitId/status', (req, res) => {
  * Endpoint para listar split payments
  * GET /split-payments?status=completed
  */
-router.get('/split-payments', (req, res) => {
-    const { status } = req.query;
+router.get('/split-payments/status', (req, res) => {
+    const { status } = req.params;
 
     try {
         const payments = splitPaymentService.listSplitPayments(status);
