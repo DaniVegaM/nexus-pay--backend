@@ -45,16 +45,14 @@ async function main() {
         recipients: [
             {
                 walletUrl: RECIPIENT_A,
-                type: "fixed",
                 value: 15000, // MXN 150 al primer receptor
                 description: "Pago fijo A",
                 priority: 1,
-                percentage: 50
             },
             {
                 walletUrl: RECIPIENT_B,
-                type: "remaining", // se lleva el remanente del TOTAL_AMOUNT
                 description: "Resto para B",
+                value:4000,
                 priority: 2
             }
             // Si prefieres porcentaje: { walletUrl: RECIPIENT_B, type: "percentage", value: 50 }

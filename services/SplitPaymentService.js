@@ -484,49 +484,21 @@ class SplitPaymentService {
         let remainingAmount = totalAmount ? Number(totalAmount) : 0;
         const baseAmount = remainingAmount;
 
-        // Procesar por prioridad: fixed amounts primero, luego percentages, finalmente remaining
-        const sortedByType = [...recipients].sort((a, b) => {
-            const typeOrder = { 'fixed': 1, 'percentage': 2, 'remaining': 3 };
-            return typeOrder[a.type] - typeOrder[b.type];
-        });
 
-        for (const recipient of sortedByType) {
+        for (const recipient of recipients) {
             // Obtener wallet del receptor
             const recipientWallet = await this.openPaymentsService.getWalletAddress(recipient.walletUrl);
 
-            let calculatedAmount;
 
-            switch (recipient.type) {
-                case 'fixed':
-                    calculatedAmount = Number(recipient.value);
-                    remainingAmount -= calculatedAmount;
-                    break;
 
-                case 'percentage':
-                    if (!baseAmount) {
-                        throw new Error('Total amount required for percentage calculations');
-                    }
-                    calculatedAmount = Math.floor((baseAmount * Number(recipient.value)) / 100);
-                    remainingAmount -= calculatedAmount;
-                    break;
-
-                case 'remaining':
-                    calculatedAmount = Math.max(0, remainingAmount);
-                    remainingAmount = 0;
-                    break;
-
-                default:
-                    throw new Error(`Invalid recipient type: ${recipient.type}`);
-            }
-
-            if (calculatedAmount <= 0) {
+            if (recipient.value <= 0) {
                 throw new Error(`Invalid amount calculated for recipient ${recipient.walletUrl}: ${calculatedAmount}`);
             }
 
             processed.push({
                 ...recipient,
                 recipientWallet,
-                calculatedAmount,
+                calculatedAmount:recipient.value,
                 priority: recipient.priority || 5
             });
         }
@@ -756,14 +728,6 @@ class SplitPaymentService {
         request.recipients.forEach((recipient, index) => {
             if (!recipient.walletUrl) {
                 throw new Error(`Recipient ${index}: wallet URL is required`);
-            }
-
-            if (!['fixed', 'percentage', 'remaining'].includes(recipient.type)) {
-                throw new Error(`Recipient ${index}: type must be 'fixed', 'percentage', or 'remaining'`);
-            }
-
-            if (recipient.type !== 'remaining' && (!recipient.value || Number(recipient.value) <= 0)) {
-                throw new Error(`Recipient ${index}: valid value is required`);
             }
 
             if (recipient.priority && (recipient.priority < 1 || recipient.priority > 10)) {

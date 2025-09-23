@@ -45,29 +45,6 @@ class ClientOpenPaymentsService {
         return this.client;
     }
 
-    async initializeClientFor(walletAddressUrl) {
-        // Reutiliza si ya es el mismo wallet activo
-        if (this.client && this._currentWallet === walletAddressUrl) {
-            return this.client;
-        }
-
-        const privateKey =
-            typeof this.config.privateKey === 'string'
-                ? this.config.privateKey
-                : fs.readFileSync(this.config.privateKey, "utf8");
-
-        const dynamicClient = await createAuthenticatedClient({
-            walletAddressUrl,
-            privateKey,
-            keyId: this.config.keyId,
-        });
-
-        // Guarda como “cliente actual” (opcional)
-        this.client = dynamicClient;
-        this._currentWallet = walletAddressUrl;
-
-        return dynamicClient;
-    }
     // ============= WALLET ADDRESS OPERATIONS =============
 
     /**
@@ -218,7 +195,7 @@ class ClientOpenPaymentsService {
      * Crea una solicitud de pago entrante
      */
     async createIncomingPayment(walletAddress, grant, paymentData) {
-        const client = await this.initializeClientFor(walletAddress.id);
+        const client = await this.initializeClient()
 
         console.log({
                 url: walletAddress.resourceServer,
@@ -273,7 +250,7 @@ class ClientOpenPaymentsService {
      * Crea un pago saliente
      */
     async createOutgoingPayment(walletAddress, grant, paymentData) {
-        const client = await this.initializeClientFor(walletAddress.id); // firma como sender
+        const client = await this.initializeClient();
         return await client.outgoingPayment.create(
             {
                 url: walletAddress.resourceServer,
