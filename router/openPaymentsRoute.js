@@ -100,16 +100,16 @@ router.get('/split-payment/callback/:splitId', async (req, res) => {
         console.log(`Exitosos: ${result.executionSummary.successfulPayments}/${result.executionSummary.totalRecipients}`);
 
         // 3. Redirigir al frontend con resultado
-        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4000';
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173/dashboard';
 
         if (result.status === 'completed') {
-            const successUrl = `${frontendUrl}/split-payment/success?splitId=${splitId}&successful=${result.executionSummary.successfulPayments}&total=${result.executionSummary.totalRecipients}`;
+            const successUrl = `${frontendUrl}?success=true`;
             res.redirect(successUrl);
         } else if (result.status === 'partially_completed') {
-            const partialUrl = `${frontendUrl}/split-payment/partial?splitId=${splitId}&successful=${result.executionSummary.successfulPayments}&failed=${result.executionSummary.failedPayments}`;
+            const partialUrl = `${frontendUrl}?success=partially`;
             res.redirect(partialUrl);
         } else {
-            const failedUrl = `${frontendUrl}/split-payment/failed?splitId=${splitId}&error=execution_failed`;
+            const failedUrl = `${frontendUrl}?success=false`;
             res.redirect(failedUrl);
         }
 

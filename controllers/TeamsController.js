@@ -9,7 +9,7 @@ export const getTeams = async (req, res) => {
                 { 
                     model: Member, 
                     as: 'members', 
-                    attributes: ['id', 'name', 'email', ['salary', 'distributionValue'], 'rol'],
+                    attributes: ['id', 'name', 'email', ['salary', 'distributionValue'], 'rol', 'walletAddress'],
                     required: false // LEFT JOIN para incluir equipos sin miembros
                 },
                 {
