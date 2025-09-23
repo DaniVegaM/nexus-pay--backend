@@ -1,5 +1,4 @@
 import { Member, Team, Project } from "../models/index.js";
-import { Sequelize } from "sequelize";
 
 export const getTeams = async (req, res) => {
     try {
@@ -97,3 +96,30 @@ export const deleteTeam = async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 }
+
+export const updateTeam = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Verificar si el equipo existe
+        const team = await Team.findByPk(id);
+        if (!team) {
+            return res.status(404).json({ error: "Team not found." });
+        }
+
+        const [updatedCount, row] = await Team.update(req.body, { where: { id } });
+
+        if (updatedCount === 0) {
+            return res.status(400).json({ error: "No changes made to the team." });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Team updated successfully.",
+            data: row
+        });
+    } catch (error) { 
+        console.error("Error updating team:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};

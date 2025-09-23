@@ -1,8 +1,8 @@
 import express from 'express';
 import { getMembers, postMember, updateSalaryMember, deleteMember } from '../controllers/MemberController.js'
 import { getUsers, postUser, deleteUser, updateUser } from '../controllers/UserController.js';
-import { getTeams, createTeam, deleteTeam } from '../controllers/TeamsController.js';
-import { getProjects, getProjectById, postProject, deleteProject } from '../controllers/ProjectController.js';
+import { getTeams, createTeam, deleteTeam, updateTeam } from '../controllers/TeamsController.js';
+import { getProjects, getProjectById, postProject, deleteProject, addTeamToProject, removeTeamFromProject } from '../controllers/ProjectController.js';
 
 const MEMBER_PATH = '/member'
 const USER_PATH = '/user'
@@ -27,11 +27,14 @@ router.put(`${USER_PATH}/:id`, updateUser );
 router.get(`${TEAMS_PATH}/`, getTeams);
 router.post(`${TEAMS_PATH}/`, createTeam)
 router.delete(`${TEAMS_PATH}/:id`, deleteTeam)
+router.put(`${TEAMS_PATH}/:id`, updateTeam)
 
 // Project endpoints
 router.get(`${PROJECT_PATH}/`, getProjects);
 router.get(`${PROJECT_PATH}/:id`, getProjectById);
 router.post(`${PROJECT_PATH}/`, postProject );
 router.delete(`${PROJECT_PATH}/:id`, deleteProject );
+router.post(`${PROJECT_PATH}/:projectId/teams`, addTeamToProject);
+router.delete(`${PROJECT_PATH}/:projectId/teams/:teamId`, removeTeamFromProject);
 
 export default router;
