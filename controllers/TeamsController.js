@@ -14,6 +14,7 @@ export const getTeams = async (req, res) => {
                 },
                 {
                     model: Project,
+                    as: 'project',
                     attributes: ['id', 'name', 'total'],
                     required: false // LEFT JOIN para incluir equipos sin proyecto
                 }
@@ -27,12 +28,14 @@ export const getTeams = async (req, res) => {
             
             // Calcular balance: (porcentaje del equipo / 100) * total del proyecto
             let balance = 0;
-            if (teamData.Project && teamData.Project.total && teamData.percentage) {
-                balance = (teamData.percentage / 100) * teamData.Project.total;
+            if (teamData.project && teamData.project.total && teamData.percentage) {
+                balance = (teamData.percentage / 100) * teamData.project.total;
             }
             
             return {
                 ...teamData,
+                Project: teamData.project, // Renombrar de 'project' a 'Project' para mantener consistencia
+                project: undefined, // Eliminar el campo original
                 totalMembers,
                 balance: parseFloat(balance.toFixed(2)) // Redondear a 2 decimales
             };

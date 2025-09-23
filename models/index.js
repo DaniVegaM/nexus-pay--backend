@@ -4,24 +4,30 @@ import Project from './ProjectModel.js';
 import Team from './TeamModel.js';
 
 User.hasMany(Project, {
-  as: 'projects'
+  as: 'projects',
+  foreignKey: 'UserId'
 });
 Project.belongsTo(User, {
-  as: 'manager'
+  as: 'manager',
+  foreignKey: 'UserId'
 });
 
 Team.hasMany(Member, {
-  as: 'members'
-}, { as: 'members' });
+  as: 'members',
+  foreignKey: 'TeamId'
+});
 Member.belongsTo(Team, {
-  as: 'team'
+  as: 'team',
+  foreignKey: 'TeamId'
 });
 
 Project.hasMany(Team, {
-  as: 'teams'
+  as: 'teams',
+  foreignKey: 'ProjectId'
 });
 Team.belongsTo(Project, {
-  as: 'project'
+  as: 'project',
+  foreignKey: 'ProjectId'
 });
 
 export {
