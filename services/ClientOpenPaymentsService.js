@@ -52,7 +52,7 @@ class ClientOpenPaymentsService {
      */
     async getWalletAddress(url) {
         const client = await this.initializeClient();
-        return await client.walletAddress.get({ url });
+        return await client.walletAddress.get({ url:url});
     }
 
     /**
@@ -489,7 +489,7 @@ export const DEFAULT_TEST_CONFIG = {
         path.resolve(__dirname, "./..", "private.key"), // ajusta al nivel real
         "utf8"
     ),
-    baseUrl: "http://localhost:3000"
+    baseUrl: "http://localhost:4000"
 };
 
 export default ClientOpenPaymentsService;

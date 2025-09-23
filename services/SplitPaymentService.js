@@ -671,6 +671,38 @@ class SplitPaymentService {
         }
     }
 
+    async generateLinkPayment(receivingWalletAddress,amount,description){
+        const recipientWallet= await this.openPaymentsService.getWalletAddress(receivingWalletAddress);
+
+        if (!recipientWallet?.id) throw new Error("recipientWallet inválido: falta id");
+
+        // 1) Grant del AS del receptor con permisos para crear, leer y completar
+        const incomingGrant = await this.openPaymentsService.createIncomingPaymentGrant(
+            recipientWallet,
+            ["create", "read", "complete"]
+        );
+
+        // 2) Payload para el RS del receptor (el incoming se crea en la wallet del receptor)
+        const payload = {
+            walletAddress: recipientWallet.id,
+            incomingAmount: {
+                "value": amount,
+                "assetCode": recipientWallet.assetCode,
+                "assetScale": recipientWallet.assetScale
+            }
+        };
+
+        const incomingPayment = await this.openPaymentsService.createIncomingPayment(
+            recipientWallet,          // se inicializa el client con la wallet del receptor
+            incomingGrant,            // token del AS del receptor
+            payload
+        );
+        console.log(incomingPayment)
+
+        // Devolvemos BOTH: incoming + grant (para poder leerlo y completarlo después)
+        return incomingPayment;
+    }
+
     async _createIncomingPayment(recipientWallet, amount, description) {
         if (!recipientWallet?.id) throw new Error("recipientWallet inválido: falta id");
 

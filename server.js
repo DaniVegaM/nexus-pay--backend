@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 
 import apiRoutes from './router/apiRoutes.js';
 import db from './config/database.js';
+import router from "./router/openPaymentsRoute.js";
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api', apiRoutes);
+app.use('/', router);
 
 // Start Server
 const port = process.env.PORT || 4000;
