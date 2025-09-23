@@ -12,14 +12,23 @@ export const getMembers = async (req, res) => {
 
 export const postMember = async (req, res) => {
     try {
-        const createdMember = await Member.create( req.body );
+        // Mapear teamId a TeamId si viene en minúscula
+        const memberData = { ...req.body };
+        if (memberData.teamId && !memberData.TeamId) {
+            memberData.TeamId = memberData.teamId;
+            delete memberData.teamId;
+        }
+        
+        const createdMember = await Member.create( memberData );
         
         const response_data = {
+            id: createdMember.id,
             name: createdMember.name,
             email: createdMember.email,
             walletAddress: createdMember.walletAddress,
             salary: createdMember.salary,
-            rol: createdMember.rol
+            rol: createdMember.rol,
+            TeamId: createdMember.TeamId
         }
 
         res.status(201).json({
@@ -49,6 +58,30 @@ export const deleteMember = async (req, res) => {
         res.status(200).json({ message: "Member deleted successfully." });
     } catch (error) {
         console.error("Error deleting member:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+export const updateSalaryMember = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { salary } = req.body;
+
+        const member = await Member.findByPk(id);
+        if (!member) {
+            return res.status(404).json({ error: "Member not found." });
+        }
+
+        member.salary = salary;
+        await member.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Member salary updated successfully.",
+            data: member
+        });
+    } catch (error) {
+        console.error("Error updating member salary:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 }

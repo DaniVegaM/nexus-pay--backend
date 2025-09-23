@@ -6,7 +6,7 @@ import Team from './TeamModel.js';
 User.hasMany(Project);
 Project.belongsTo(User);
 
-Team.hasMany(Member);
+Team.hasMany(Member, { as: 'members' });
 Member.belongsTo(Team);
 
 Project.hasMany(Team);

@@ -19,6 +19,7 @@ const Team = db.define('Team', {
     percentage: {
         type: DataTypes.FLOAT,
         allowNull: false,
+        defaultValue: 0.0,
         validate: {
             min: 0,
             max: 100

@@ -23,9 +23,7 @@ app.use((req, res, next) => {
 //Sync DB
 try {
     await db.authenticate(); //Async function
-    await db.sync({
-      force: true
-    });
+    await db.sync();
     console.log("Connection to DB established");
 } catch (error) {
     console.log(error);
